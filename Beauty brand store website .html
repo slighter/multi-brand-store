@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Beauty Store - All Premium Brands</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-marin: #F5E6D3;
+            --color-cherry: #E91E63;
+            --color-chottu: #006994;
+            --color-chotti: #2ECC71;
+            --text-dark: #333;
+            --text-light: #666;
+            --bg-light: #FAFAFA;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #fff;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, #000 0%, #222 100%);
+            color: white;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        nav a:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        nav a.active {
+            background: white;
+            color: #000;
+        }
+
+        .cart-icon {
+            font-size: 20px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #FF6B9D;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .banner {
+            background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .banner h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+        }
+
+        .brand-tabs {
+            display: flex;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .brand-btn {
+            padding: 12px 24px;
+            border: 2px solid white;
+            background: transparent;
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .brand-btn:hover,
+        .brand-btn.active {
+            transform: scale(1.05);
+        }
+
+        .brand-btn.active {
+            background: white;
+            color: #000;
+        }
+
+        .brand-btn.marin.active {
+            background: var(--color-marin);
+        }
+
+        .brand-btn.cherry.active {
+            background: var(--color-cherry);
+            color: white;
+        }
+
+        .brand-btn.chottu.active {
+            background: var(--color-chottu);
+            color: white;
+        }
+
+        .brand-btn.chotti.active {
+            background: var(--color-chotti);
+            color: white;
+        }
+
+        .brand-section {
+            display: none;
+        }
+
+        .brand-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .brand-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .brand-desc {
+            font-size: 16px;
+            color: var(--text-light);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 60px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #999;
+            position: relative;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            background: #FF6B9D;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        .product-desc {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            height: 40px;
+            overflow: hidden;
+        }
+
+        .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .product-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .add-to-cart-btn {
+            background: #FF6B9D;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+
+        .add-to-cart-btn:hover {
+            background: #E91E63;
+            transform: scale(1.05);
+        }
+
+        .shade-selector {
+            margin: 10px 0;
+        }
+
+        .shade-selector label {
+            font-size: 12px;
+            color: var(--text-light);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .shade-options {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .shade-btn {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .shade-btn:hover,
+        .shade-btn.selected {
+            border-color: #FF6B9D;
+            background: #FFF0F5;
+            color: #FF6B9D;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .cart-section {
+            display: none;
+        }
+
+        .cart-section.active {
+            display: block;
+        }
+
+        .cart-items {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        .cart-total {
+            font-size: 18px;
+            font-weight: 700;
+            padding: 15px 0;
+            border-top: 2px solid #f0f0f0;
+            margin-top: 15px;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 12px;
+            background: #FF6B9D;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .checkout-btn:hover {
+            background: #E91E63;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+
+        .profile-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            z-index: 250;
+            overflow-y: auto;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .profile-modal.active {
+            display: block;
+            animation: slideIn 0.3s ease-in;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #FF6B9D 0%, #E91E63 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .profile-header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .close-profile-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.3);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-section {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .profile-section h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .profile-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .profile-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .profile-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .tier-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .tier-card {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #ddd;
+            background: #f9f9f9;
+        }
+
+        .tier-card.active {
+            border-color: #FF6B9D;
+            background: #FFF0F5;
+        }
+
+        .tier-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .tier-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .tier-points {
+            font-size: 11px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 240;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        .payment-method {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .payment-method:hover {
+            border-color: #FF6B9D;
+            background: #FFF0F5;
+        }
+
+        .payment-method.selected {
+            border-color: #FF6B9D;
+            background: #FFF0F5;
+        }
+
+        .payment-radio {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .payment-radio.checked {
+            background: #FF6B9D;
+            border-color: #FF6B9D;
+        }
+
+        .checkout-container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .checkout-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
+        .checkout-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .order-summary {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-weight: 700;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .place-order-btn {
+            width: 100%;
+            padding: 14px;
+            background: #FF6B9D;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .place-order-btn:hover {
+            background: #E91E63;
+        }
+
+        .hidden-section {
+            display: none;
+        }
+
+        .hidden-section.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .profile-modal {
+                width: 100%;
+            }
+        }
+
+        footer {
+            background: #1a1a1a;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 60px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            nav {
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+
+            nav a {
+                display: block;
+                text-align: center;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .banner h1 {
+                font-size: 24px;
+            }
+
+            .brand-tabs {
+                gap: 8px;
+            }
+
+            .brand-btn {
+                padding: 8px 14px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo">✨ Beauty Multi-Store</div>
+            <nav>
+                <a href="#" class="nav-link active" data-brand="all">All Brands</a>
+                <a href="#" class="nav-link" data-brand="marin">Marin</a>
+                <a href="#" class="nav-link" data-brand="cherry">Cherry</a>
+                <a href="#" class="nav-link" data-brand="chottu">Chottu</a>
+                <a href="#" class="nav-link" data-brand="chotti">Chotti</a>
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <div class="cart-icon" onclick="toggleCart()">
+                        🛒
+                        <span class="cart-count" id="cart-count">0</span>
+                    </div>
+                    <div class="profile-icon" onclick="toggleProfile()" style="cursor: pointer; font-size: 24px;">
+                        👤
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Banner -->
+    <div class="banner">
+        <h1>Premium Beauty Collections</h1>
+        <p>Discover Your Perfect Look with Our Exclusive Brands</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Brand Selection -->
+        <div class="brand-tabs">
+            <button class="brand-btn active" onclick="filterBrand('all')">All Brands</button>
+            <button class="brand-btn marin" onclick="filterBrand('marin')">Marin Beauty</button>
+            <button class="brand-btn cherry" onclick="filterBrand('cherry')">Cherry Beauty</button>
+            <button class="brand-btn chottu" onclick="filterBrand('chottu')">Chottu Beauty</button>
+            <button class="brand-btn chotti" onclick="filterBrand('chotti')">Chotti Beauty</button>
+        </div>
+
+        <!-- Marin Beauty Section -->
+        <div class="brand-section active" id="marin-section">
+            <div class="brand-header">
+                <div class="brand-title" style="color: #D4A574;">Marin Beauty - Vanilla Dreams</div>
+                <div class="brand-desc">Soft, elegant, and luxurious vanilla-inspired cosmetics</div>
+            </div>
+            <div class="products-grid" id="marin-products"></div>
+        </div>
+
+        <!-- Cherry Beauty Section -->
+        <div class="brand-section" id="cherry-section">
+            <div class="brand-header">
+                <div class="brand-title" style="color: #E91E63;">Cherry Beauty - Red Passion</div>
+                <div class="brand-desc">Bold, vibrant, and cherry-infused beauty essentials</div>
+            </div>
+            <div class="products-grid" id="cherry-products"></div>
+        </div>
+
+        <!-- Chottu Beauty Section -->
+        <div class="brand-section" id="chottu-section">
+            <div class="brand-header">
+                <div class="brand-title" style="color: #006994;">Chottu Beauty - Ocean Blue</div>
+                <div class="brand-desc">Serene sea-blue inspired cosmetics for the modern you</div>
+            </div>
+            <div class="products-grid" id="chottu-products"></div>
+        </div>
+
+        <!-- Chotti Beauty Section -->
+        <div class="brand-section" id="chotti-section">
+            <div class="brand-header">
+                <div class="brand-title" style="color: #2ECC71;">Chotti Beauty - Tropical Green</div>
+                <div class="brand-desc">Fresh, tropical green with palm and coconut vibes</div>
+            </div>
+            <div class="products-grid" id="chotti-products"></div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div class="modal" id="cart-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="toggleCart()">&times;</span>
+            <h2>Shopping Cart</h2>
+            <div class="cart-section active">
+                <ul class="cart-items" id="cart-items"></ul>
+                <div class="empty-cart" id="empty-cart-msg" style="display: none;">Your cart is empty</div>
+                <div class="cart-total">Total: $<span id="cart-total">0.00</span></div>
+                <button class="checkout-btn" onclick="openCheckout()">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="overlay" id="profile-overlay" onclick="toggleProfile()"></div>
+    <div class="profile-modal" id="profile-modal">
+        <button class="close-profile-btn" onclick="toggleProfile()">×</button>
+        <div class="profile-header">
+            <h2>My Profile</h2>
+        </div>
+        
+        <div class="profile-section">
+            <h3>Personal Information</h3>
+            <div class="profile-item">
+                <span class="profile-label">Name:</span>
+                <span class="profile-value" id="profile-name">Cherry</span>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">Email:</span>
+                <span class="profile-value" id="profile-email">cherry@beautystore.com</span>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">Phone:</span>
+                <span class="profile-value" id="profile-phone">+91 98765 43210</span>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">Address:</span>
+                <span class="profile-value" id="profile-address">New Delhi, India</span>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h3>Loyalty Rewards Program</h3>
+            <div class="profile-item">
+                <span class="profile-label">Current Points:</span>
+                <span class="profile-value" style="color: #FF6B9D;">2,450 pts</span>
+            </div>
+            <div class="tier-container">
+                <div class="tier-card">
+                    <div class="tier-icon">⭐</div>
+                    <div class="tier-name">Silver</div>
+                    <div class="tier-points">0-1000 pts</div>
+                </div>
+                <div class="tier-card active">
+                    <div class="tier-icon">✨</div>
+                    <div class="tier-name">Gold</div>
+                    <div class="tier-points">1000-5000 pts</div>
+                </div>
+                <div class="tier-card">
+                    <div class="tier-icon">👑</div>
+                    <div class="tier-name">Platinum</div>
+                    <div class="tier-points">5000+ pts</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h3>Tier Benefits</h3>
+            <div style="font-size: 13px; color: #666; line-height: 1.6;">
+                <p>🎁 Gold Member Perks:</p>
+                <p>• 2x Reward Points on all purchases</p>
+                <p>• Early access to new collections</p>
+                <p>• Birthday special discount</p>
+                <p>• Free shipping on orders</p>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <button class="place-order-btn" onclick="logout()" style="background: #999;">Logout</button>
+        </div>
+    </div>
+
+    <!-- Checkout Page -->
+    <div class="hidden-section" id="checkout-page">
+        <div class="checkout-container">
+            <div class="checkout-card">
+                <h1 class="checkout-title">Order Summary</h1>
+                <div class="order-summary" id="checkout-summary"></div>
+            </div>
+
+            <div class="checkout-card">
+                <h2 class="checkout-title">Shipping Address</h2>
+                <div class="profile-item">
+                    <span class="profile-label">Address:</span>
+                    <span class="profile-value">New Delhi, India</span>
+                </div>
+            </div>
+
+            <div class="checkout-card">
+                <h2 class="checkout-title">Select Payment Method</h2>
+                
+                <div class="payment-method" onclick="selectPayment('card')">
+                    <div class="payment-radio"></div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; font-size: 14px;">💳 Credit/Debit Card</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">Visa, Mastercard, American Express</div>
+                    </div>
+                </div>
+
+                <div class="payment-method" onclick="selectPayment('upi')">
+                    <div class="payment-radio"></div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; font-size: 14px;">📱 UPI Payment</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">Google Pay, PhonePe, Paytm</div>
+                    </div>
+                </div>
+
+                <div class="payment-method" onclick="selectPayment('wallet')">
+                    <div class="payment-radio"></div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; font-size: 14px;">💰 Digital Wallet</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">Amazon Pay, Apple Pay</div>
+                    </div>
+                </div>
+
+                <div class="payment-method" onclick="selectPayment('cod')">
+                    <div class="payment-radio"></div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; font-size: 14px;">🚚 Cash on Delivery</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">Pay when your order arrives</div>
+                    </div>
+                </div>
+
+                <button class="place-order-btn" onclick="placeOrder()">Place Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Multi-Beauty Store. All rights reserved. | Premium Beauty Brands in One Place</p>
+    </footer>
+
+    <script>
+        // Product Data
+        const products = {
+            marin: [
+                { id: 1, name: "Velvet Veil Foundation", category: "Foundation", price: 45, shades: ["Fair", "Light", "Medium", "Tan", "Deep"], desc: "Smooth vanilla-scented foundation", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/d72b694b-b1cf-44a7-b0c6-be9709e7472c.png" },
+                { id: 2, name: "Silk Primer Pro", category: "Primer", price: 32, shades: ["Universal"], desc: "Silky vanilla primer for perfect base", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/8a398e87-ea2a-4091-bc91-dfacd2abe002.png" },
+                { id: 3, name: "Cloud Moisturizer", category: "Moisturiser", price: 38, shades: ["Universal"], desc: "Luxurious vanilla cream moisturizer", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/30407039-bebf-40ce-ad79-4b096b4ea4a8.png" },
+                { id: 4, name: "Sun Glow SPF 50", category: "Sunscreen", price: 28, shades: ["Universal"], desc: "Vanilla-scented daily sun protection", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/00d31d7a-b058-4239-8431-a1f022294051.png" },
+                { id: 5, name: "Vanilla Dreams Eye Palette", category: "Eyeshadow", price: 42, shades: ["Warm", "Cool", "Neutral", "Shimmer", "Matte"], desc: "6-shade vanilla inspired palette", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/f186b6af-04d6-41e4-99a6-4adfd387cf06.png" },
+                { id: 6, name: "Golden Line Eyeliner", category: "Eyeliner", price: 18, shades: ["Brown", "Black", "Gold", "Bronze", "Nude"], desc: "Precision liquid eyeliner", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/809dc058-13a9-40e7-9a17-3cd5559bd522.png" },
+                { id: 7, name: "Lush Lashes Mascara", category: "Mascara", price: 25, shades: ["Black", "Brown", "Navy"], desc: "Volumizing waterproof mascara", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/0b708529-384d-41de-99d3-3da599fb2fb9.png" },
+                { id: 8, name: "Cream Blush Trio", category: "Blush", price: 35, shades: ["Peach", "Rose", "Vanilla"], desc: "Creamy vanilla-toned blush", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/9892acad-63af-4fcf-b24c-b1aa31e2be00.png" },
+                { id: 9, name: "Radiant Highlighter", category: "Highlighter", price: 29, shades: ["Gold", "Rose", "Pearl"], desc: "Luminous highlight powder", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/900f27d2-6b1f-4eeb-9eec-14553a728f1c.png" },
+                { id: 10, name: "Velour Lipstick", category: "Lipstick", price: 24, shades: ["Berry", "Nude", "Red", "Plum", "Mauve"], desc: "Long-wear vanilla-scented lipstick", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/1cb035cf-c9b1-4d60-ad18-9d166ffe5349.png" },
+                { id: 11, name: "Perfect Line Lip Liner", category: "Lip Liner", price: 15, shades: ["Rose", "Berry", "Nude", "Brown", "Red"], desc: "Precise lip defining pencil", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/93378eb8-134d-4be1-b20b-71646fc82cb5.png" },
+                { id: 12, name: "Silk Gloss", category: "Lipgloss", price: 19, shades: ["Clear", "Pink", "Nude", "Berry", "Gold"], desc: "Glossy vanilla lip shine", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/f57abbf9-bb1e-4eeb-925c-8deed9a465e7.png" }
+            ],
+            cherry: [
+                { id: 20, name: "Cherry Kiss Foundation", category: "Foundation", price: 48, shades: ["Fair", "Light", "Medium", "Tan", "Deep"], desc: "Cherry-infused perfect coverage", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/d44d6bdb-8a44-426b-9874-9d75ebf96d53.png" },
+                { id: 21, name: "Cherry Base Primer", category: "Primer", price: 34, shades: ["Universal"], desc: "Cherry extract smoothing primer", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/f579a914-3322-4c2e-9858-6098e49503cd.png" },
+                { id: 22, name: "Berry Bloom Moisturizer", category: "Moisturiser", price: 40, shades: ["Universal"], desc: "Cherry-enriched hydrating cream", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/6453e367-176b-4e40-ad9d-029f42c155cc.png" },
+                { id: 23, name: "Cherry Guard SPF 50", category: "Sunscreen", price: 30, shades: ["Universal"], desc: "Cherry-extract sun protection", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/5c04fc59-7734-4fcf-962a-fa3b064f08d2.png" },
+                { id: 24, name: "Cherry Passion Palette", category: "Eyeshadow", price: 44, shades: ["Coral", "Crimson", "Burgundy", "Plum", "Mauve"], desc: "Cherry-tone 5-shade palette", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/80a2c646-7523-41fb-9ed2-c5df4e5c87ad.png" },
+                { id: 25, name: "Ruby Liner", category: "Eyeliner", price: 20, shades: ["Black", "Burgundy", "Red", "Wine", "Rose"], desc: "Bold cherry-red eyeliner", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/3fe4ddfb-83a5-437a-a8f0-efbb950783d8.png" },
+                { id: 26, name: "Cherry Lash Mascara", category: "Mascara", price: 27, shades: ["Black", "Burgundy", "Red"], desc: "Volume with cherry extract", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/e2fe7e80-ae50-44fd-bf70-e692601139d0.png" },
+                { id: 27, name: "Berry Blush", category: "Blush", price: 36, shades: ["Coral", "Berry", "Wine"], desc: "Cherry-tone cream blush", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/f4dd2724-6c73-444d-a64e-8a8552c0935f.png" },
+                { id: 28, name: "Ruby Glow Highlighter", category: "Highlighter", price: 31, shades: ["Rose Gold", "Red", "Crimson"], desc: "Warm cherry highlight", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/1664550d-211d-41fb-a215-73ef49635186.png" },
+                { id: 29, name: "Cherry Luxe Lipstick", category: "Lipstick", price: 26, shades: ["Cherry", "Deep Red", "Rose", "Coral", "Mauve"], desc: "Creamy cherry-toned lipstick", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/37d7f0ce-cdb7-4d9a-bc95-292c074f682b.png" },
+                { id: 30, name: "Cherry Define Lip Liner", category: "Lip Liner", price: 17, shades: ["Cherry", "Red", "Rose", "Wine", "Coral"], desc: "Cherry-red precision liner", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/dc837938-eeb3-4905-8aba-48fcc1a84275.png" },
+                { id: 31, name: "Cherry Shine Gloss", category: "Lipgloss", price: 21, shades: ["Clear", "Red", "Rose", "Berry", "Nude"], desc: "Glossy cherry lip shine", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/75b09709-52d0-49bc-9dae-65417f4fd450.png" }
+            ],
+            chottu: [
+                { id: 40, name: "Sky Blue Foundation", category: "Foundation", price: 46, shades: ["Fair", "Light", "Medium", "Tan", "Deep"], desc: "Ocean blue-inspired coverage", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/5f925343-c97f-4e1a-ac9b-22cb5de2b0de.png" },
+                { id: 41, name: "Ocean Primer", category: "Primer", price: 33, shades: ["Universal"], desc: "Sea-blue base smoothing primer", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/16daa5df-19fc-4e35-9847-826566646fb4.png" },
+                { id: 42, name: "Aqua Moisturizer", category: "Moisturiser", price: 39, shades: ["Universal"], desc: "Sea-inspired hydrating moisturizer", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/01ddae3e-8e99-49f6-ac71-3493b88aa89c.png" },
+                { id: 43, name: "Sea Protect SPF 50", category: "Sunscreen", price: 29, shades: ["Universal"], desc: "Ocean-themed sun protection", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/42abe83c-24dd-4b67-8308-702e9871ec73.png" },
+                { id: 44, name: "Chottu Blue Palette", category: "Eyeshadow", price: 43, shades: ["Sky", "Ocean", "Navy", "Teal", "Aqua"], desc: "5-shade ocean blue palette", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/c4da0bc4-0eaa-49ff-b99d-7d5ac8adf0f4.png" },
+                { id: 45, name: "Azure Eyeliner", category: "Eyeliner", price: 19, shades: ["Navy", "Blue", "Black", "Teal", "Sky"], desc: "Ocean-blue liquid eyeliner", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/4e8b9c2f-8a8e-4b2c-9f8c-3b7e6d5a4c1b.png" },
+                { id: 46, name: "Chottu Mascara", category: "Mascara", price: 26, shades: ["Black", "Navy", "Blue"], desc: "Blue-toned volumizing mascara", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/7c9d0e1f-2a3b-4c5d-6e7f-8a9b0c1d2e3f.png" },
+                { id: 47, name: "Sky Blush", category: "Blush", price: 34, shades: ["Periwinkle", "Coral", "Peach"], desc: "Sky-toned cream blush", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/9e8d7c6b-5a4f-3e2d-1c0b-9a8f7e6d5c4b.png" },
+                { id: 48, name: "Ocean Glow Highlighter", category: "Highlighter", price: 30, shades: ["Silver", "Aqua", "Pearl"], desc: "Cool-toned ocean highlight", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/3b2c1d0e-9f8a-7b6c-5d4e-3f2a1b0c9d8e.png" },
+                { id: 49, name: "Chottu Lipstick", category: "Lipstick", price: 25, shades: ["Teal", "Navy", "Blue", "Periwinkle", "Mauve"], desc: "Sea-blue toned lipstick", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/6c5b4a39-2817-0f9e-8d7c-6b5a4f3e2d1c.png" },
+                { id: 50, name: "Sea Lip Liner", category: "Lip Liner", price: 16, shades: ["Teal", "Blue", "Navy", "Coral", "Pink"], desc: "Ocean-blue precision lip liner", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/1a0f9e8d-7c6b-5a4f-3e2d-1c0b9a8f7e6d.png" },
+                { id: 51, name: "Aqua Gloss", category: "Lipgloss", price: 20, shades: ["Clear", "Blue", "Teal", "Pink", "Nude"], desc: "Ocean-inspired lip gloss", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/5e4d3c2b-1a0f-9e8d-7c6b-5a4f3e2d1c0b.png" }
+            ],
+            chotti: [
+                { id: 60, name: "Tropical Foundation", category: "Foundation", price: 47, shades: ["Fair", "Light", "Medium", "Tan", "Deep"], desc: "Tropical green-inspired base", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/8f7e6d5c-4b3a-2918-0f7e-6d5c4b3a2918.png" },
+                { id: 61, name: "Palm Primer", category: "Primer", price: 34, shades: ["Universal"], desc: "Tropical green smoothing primer", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/3a2918-0f7e-6d5c-4b3a-2918-0f7e-6d5c-4b3a.png" },
+                { id: 62, name: "Coconut Moisturizer", category: "Moisturiser", price: 40, shades: ["Universal"], desc: "Coconut-infused tropical cream", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/4c3b2a19-0e6d-5c4b-3a29-18-0f7e-6d5c-4b3a.png" },
+                { id: 63, name: "Tropical Shield SPF 50", category: "Sunscreen", price: 30, shades: ["Universal"], desc: "Coconut sun protection", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/7e6d5c4b-3a29-180f-7e6d-5c4b3a-2918-0f7e.png" },
+                { id: 64, name: "Chotti Green Palette", category: "Eyeshadow", price: 44, shades: ["Lime", "Mint", "Forest", "Sage", "Olive"], desc: "5-shade tropical green palette", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/2a1918-0f7e-6d5c-4b3a-2918-0f7e-6d5c-4b3a.png" },
+                { id: 65, name: "Palm Eyeliner", category: "Eyeliner", price: 20, shades: ["Black", "Green", "Brown", "Bronze", "Gold"], desc: "Tropical green eyeliner", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/5b4a3918-0f7e-6d5c-4b3a-2918-0f7e-6d5c-4b3a.png" },
+                { id: 66, name: "Chotti Mascara", category: "Mascara", price: 27, shades: ["Black", "Brown", "Green"], desc: "Tropical-inspired mascara", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/8c7a6d5c-4b3a-2918-0f7e-6d5c-4b3a-2918.png" },
+                { id: 67, name: "Mint Blush", category: "Blush", price: 35, shades: ["Peach", "Rose", "Green"], desc: "Tropical mint-toned blush", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/6d5c4b3a-2918-0f7e-6d5c-4b3a-2918-0f7e.png" },
+                { id: 68, name: "Coconut Glow Highlighter", category: "Highlighter", price: 31, shades: ["Gold", "Green", "Pearl"], desc: "Tropical highlighter", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/1e0f9e8d-7c6b-5a4f-3e2d-1c0b9a8f7e6d.png" },
+                { id: 69, name: "Chotti Lipstick", category: "Lipstick", price: 26, shades: ["Coral", "Green", "Nude", "Rose", "Berry"], desc: "Tropical fruit-toned lipstick", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/9a8f7e6d-5c4b-3a29-180f-7e6d-5c4b-3a29.png" },
+                { id: 70, name: "Tropical Lip Liner", category: "Lip Liner", price: 17, shades: ["Green", "Coral", "Pink", "Rose", "Berry"], desc: "Tropical precision lip liner", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/4f3e2d1c-0b9a-8f7e-6d5c-4b3a-2918-0f7e.png" },
+                { id: 71, name: "Coconut Gloss", category: "Lipgloss", price: 21, shades: ["Clear", "Green", "Coral", "Pink", "Gold"], desc: "Coconut-scented lip gloss", image: "https://user-gen-media-assets.s3.amazonaws.com/seedream_images/3c2b1a09-8f7e-6d5c-4b3a-2918-0f7e-6d5c-4b3a.png" }
+            ]
+        };
+
+        let cart = [];
+        let currentBrand = 'all';
+
+        // Initialize products on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            renderAllProducts();
+        });
+
+        function renderAllProducts() {
+            Object.keys(products).forEach(brand => {
+                renderBrandProducts(brand);
+            });
+        }
+
+        function renderBrandProducts(brand) {
+            const container = document.getElementById(`${brand}-products`);
+            if (!container) return;
+
+            container.innerHTML = products[brand].map(product => `
+                <div class="product-card">
+                    <div class="product-image" style="background-image: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.2) 100%), url('${product.image}'); background-size: cover; background-position: center;">
+                        <span class="product-badge">${product.category}</span>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-desc">${product.desc}</div>
+                        ${product.shades.length > 1 ? `
+                            <div class="shade-selector">
+                                <label>Shade:</label>
+                                <div class="shade-options">
+                                    ${product.shades.map((shade, idx) => `
+                                        <button class="shade-btn" data-product="${product.id}" data-shade="${shade}" onclick="selectShade(this)">
+                                            ${shade}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                        <div class="product-footer">
+                            <span class="product-price">$${product.price}</span>
+                            <button class="add-to-cart-btn" onclick="addToCart(${product.id}, '${product.name}', ${product.price}, '${brand}')">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getBrandForProduct(productId) {
+            for (let brand of Object.keys(products)) {
+                if (products[brand].some(p => p.id === productId)) {
+                    return brand;
+                }
+            }
+            return 'marin';
+        }
+
+        function selectShade(btn) {
+            btn.parentElement.querySelectorAll('.shade-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
+
+        function filterBrand(brand) {
+            currentBrand = brand;
+            
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.brand === brand) link.classList.add('active');
+            });
+
+            // Update brand buttons
+            document.querySelectorAll('.brand-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Show/hide sections
+            document.querySelectorAll('.brand-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            if (brand === 'all') {
+                document.querySelectorAll('.brand-section').forEach(section => {
+                    section.classList.add('active');
+                });
+            } else {
+                const section = document.getElementById(`${brand}-section`);
+                if (section) section.classList.add('active');
+            }
+
+            // Update tab active state
+            document.querySelectorAll('.brand-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (brand === 'all') {
+                document.querySelectorAll('.brand-btn')[0].classList.add('active');
+            } else {
+                event.target.classList.add('active');
+            }
+        }
+
+        function addToCart(productId, productName, price, brand) {
+            const selectedShade = document.querySelector(`[data-product="${productId}"].shade-btn.selected`);
+            const shade = selectedShade ? selectedShade.dataset.shade : 'Default';
+            
+            const item = {
+                id: `${productId}-${shade}`,
+                productId,
+                productName,
+                shade,
+                price,
+                brand,
+                quantity: 1
+            };
+
+            const existingItem = cart.find(c => c.id === item.id);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push(item);
+            }
+
+            updateCart();
+            alert(`${productName} (${shade}) added to cart!`);
+        }
+
+        function updateCart() {
+            document.getElementById('cart-count').textContent = cart.length;
+            const cartItemsContainer = document.getElementById('cart-items');
+            const emptyMsg = document.getElementById('empty-cart-msg');
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '';
+                emptyMsg.style.display = 'block';
+                document.getElementById('cart-total').textContent = '0.00';
+            } else {
+                emptyMsg.style.display = 'none';
+                cartItemsContainer.innerHTML = cart.map(item => `
+                    <li class="cart-item">
+                        <span>${item.productName} (${item.shade}) x${item.quantity}</span>
+                        <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                    </li>
+                `).join('');
+
+                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                document.getElementById('cart-total').textContent = total.toFixed(2);
+            }
+        }
+
+        function toggleCart() {
+            document.getElementById('cart-modal').classList.toggle('active');
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            alert(`Thank you for your purchase! Total: $${total.toFixed(2)}\n\nThis is a demo. No actual purchase was made.`);
+            cart = [];
+            updateCart();
+            toggleCart();
+        }
+
+        // Profile Management
+        function toggleProfile() {
+            const profileModal = document.getElementById('profile-modal');
+            const overlay = document.getElementById('profile-overlay');
+            profileModal.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function logout() {
+            alert('You have been logged out!');
+            cart = [];
+            updateCart();
+            toggleProfile();
+        }
+
+        // Checkout Functions
+        let selectedPaymentMethod = null;
+
+        function openCheckout() {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            // Show checkout page
+            document.getElementById('checkout-page').classList.add('active');
+            document.querySelector('.container').style.display = 'none';
+            document.querySelector('.banner').style.display = 'none';
+            document.querySelector('header').style.position = 'relative';
+
+            // Generate order summary
+            generateOrderSummary();
+            toggleCart();
+        }
+
+        function generateOrderSummary() {
+            const summaryDiv = document.getElementById('checkout-summary');
+            let html = '';
+            let total = 0;
+
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                html += `
+                    <div class="order-item">
+                        <span>${item.productName} (${item.shade}) x${item.quantity}</span>
+                        <span>$${itemTotal.toFixed(2)}</span>
+                    </div>
+                `;
+            });
+
+            const tax = (total * 0.1).toFixed(2);
+            const shipping = total > 50 ? 0 : 5;
+            const grandTotal = (parseFloat(total) + parseFloat(tax) + shipping).toFixed(2);
+
+            html += `
+                <div class="order-item" style="border: none; padding-top: 10px; font-size: 13px;">
+                    <span>Subtotal:</span>
+                    <span>$${total.toFixed(2)}</span>
+                </div>
+                <div class="order-item" style="border: none; font-size: 13px;">
+                    <span>Tax (10%):</span>
+                    <span>$${tax}</span>
+                </div>
+                <div class="order-item" style="border: none; font-size: 13px; margin-bottom: 10px;">
+                    <span>Shipping:</span>
+                    <span>${shipping === 0 ? 'FREE' : '$' + shipping}</span>
+                </div>
+                <div class="order-total" style="border-top: 2px solid #e0e0e0; padding-top: 10px;">
+                    <span>Grand Total:</span>
+                    <span style="color: #FF6B9D;">$${grandTotal}</span>
+                </div>
+            `;
+
+            summaryDiv.innerHTML = html;
+        }
+
+        function selectPayment(method) {
+            selectedPaymentMethod = method;
+
+            // Update UI
+            document.querySelectorAll('.payment-method').forEach(el => {
+                el.classList.remove('selected');
+                el.querySelector('.payment-radio').classList.remove('checked');
+            });
+
+            event.currentTarget.classList.add('selected');
+            event.currentTarget.querySelector('.payment-radio').classList.add('checked');
+        }
+
+        function placeOrder() {
+            if (!selectedPaymentMethod) {
+                alert('Please select a payment method');
+                return;
+            }
+
+            const methodNames = {
+                card: 'Credit/Debit Card',
+                upi: 'UPI Payment',
+                wallet: 'Digital Wallet',
+                cod: 'Cash on Delivery'
+            };
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const tax = (total * 0.1).toFixed(2);
+            const shipping = total > 50 ? 0 : 5;
+            const grandTotal = (parseFloat(total) + parseFloat(tax) + shipping).toFixed(2);
+
+            alert(`✅ Order Placed Successfully!\n\nPayment Method: ${methodNames[selectedPaymentMethod]}\nGrand Total: $${grandTotal}\n\nYou have earned 245 bonus points!\nYour new balance: 2,695 points`);
+
+            // Reset
+            cart = [];
+            updateCart();
+            selectedPaymentMethod = null;
+            document.getElementById('checkout-page').classList.remove('active');
+            document.querySelector('.container').style.display = 'block';
+            document.querySelector('.banner').style.display = 'block';
+        }
+
+        // Navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                filterBrand(this.dataset.brand);
+            });
+        });
+    </script>
+</body>
+</html>
