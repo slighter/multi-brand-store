@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Zodiac Music Recommender</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #020617;
+      --card-bg: rgba(15, 23, 42, 0.92);
+      --accent: #f97316;
+      --accent-soft: rgba(249, 115, 22, 0.22);
+      --text-main: #f9fafb;
+      --text-soft: #cbd5f5;
+      --border-soft: rgba(148, 163, 255, 0.4);
+      --shadow-soft: 0 24px 50px rgba(15, 23, 42, 0.95);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top, #1f2937 0, #020617 55%, #000 100%);
+      color: var(--text-main);
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .app-shell {
+      max-width: 1120px;
+      width: 100%;
+      margin: auto;
+      border-radius: 24px;
+      padding: 22px 22px 18px;
+      background:
+        radial-gradient(circle at top left,
+          rgba(244, 114, 182, 0.16),
+          transparent 60%)
+        , radial-gradient(circle at top right,
+          rgba(56, 189, 248, 0.18),
+          transparent 60%)
+        , rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 255, 0.3);
+      box-shadow: var(--shadow-soft);
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
+      gap: 22px;
+      position: relative;
+    }
+
+    @media (max-width: 880px) {
+      body {
+        padding: 12px;
+      }
+      .app-shell {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 18px;
+      }
+    }
+
+    header {
+      margin-bottom: 16px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 255, 0.45);
+      font-size: 11px;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    .tag-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #a855f7;
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.9);
+    }
+
+    h1 {
+      font-size: 28px;
+      line-height: 1.1;
+      margin: 10px 0 8px;
+    }
+
+    h1 span {
+      background: linear-gradient(120deg, #f97316, #f472b6, #38bdf8);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-soft);
+      max-width: 420px;
+    }
+
+    .subtitle strong {
+      color: #e5e7eb;
+    }
+
+    .selector-label {
+      margin-top: 18px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #9ca3af;
+    }
+
+    .zodiac-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 880px) {
+      .zodiac-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .zodiac-pill {
+      border-radius: 999px;
+      padding: 7px 10px;
+      border: 1px solid transparent;
+      background: rgba(15, 23, 42, 0.8);
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      transition: all 0.18s ease;
+      color: var(--text-soft);
+      text-align: center;
+    }
+
+    .zodiac-pill span.sign {
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 10px;
+    }
+
+    .zodiac-pill span.element {
+      font-size: 10px;
+      opacity: 0.76;
+    }
+
+    .zodiac-pill:hover {
+      border-color: rgba(148, 163, 255, 0.9);
+      transform: translateY(-1px);
+      background: radial-gradient(circle at top,
+        rgba(79, 70, 229, 0.26),
+        rgba(15, 23, 42, 0.96));
+    }
+
+    .zodiac-pill.active {
+      border-color: var(--accent);
+      box-shadow:
+        0 0 0 1px rgba(249, 115, 22, 0.7),
+        0 8px 18px rgba(15, 23, 42, 0.9);
+      background:
+        radial-gradient(circle at top,
+          rgba(249, 115, 22, 0.28),
+          rgba(15, 23, 42, 0.96));
+      color: var(--text-main);
+    }
+
+    .hint {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #9ca3af;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hint span.key {
+      font-size: 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(148, 163, 255, 0.55);
+      padding: 2px 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    /* Birthday box */
+    .birth-box {
+      margin-top: 18px;
+      padding: 10px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 255, 0.45);
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    .birth-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #9ca3af;
+      margin-bottom: 6px;
+    }
+
+    .birth-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .birth-row input[type="date"] {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 255, 0.6);
+      background: rgba(15, 23, 42, 0.95);
+      color: #e5e7eb;
+      font-size: 12px;
+    }
+
+    .birth-row input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+    }
+
+    .birth-row button {
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 0;
+      background: linear-gradient(135deg, #f97316, #f472b6);
+      color: #0b1120;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .birth-row button:hover {
+      filter: brightness(1.08);
+    }
+
+    .birth-note {
+      font-size: 10px;
+      color: #9ca3af;
+      line-height: 1.4;
+    }
+
+    .birth-note span {
+      color: #e5e7eb;
+    }
+
+    /* Right panel */
+    .panel-right {
+      border-radius: 18px;
+      background: linear-gradient(145deg,
+        rgba(15, 23, 42, 0.96),
+        rgba(15, 23, 42, 0.96));
+      border: 1px solid var(--border-soft);
+      padding: 16px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel-right::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top left,
+          rgba(248, 250, 252, 0.04),
+          transparent 60%);
+      pointer-events: none;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .sign-main {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sign-name {
+      font-size: 22px;
+      font-weight: 650;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sign-name span.emoji {
+      font-size: 20px;
+    }
+
+    .sign-dates {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .sign-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .pill {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 255, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+    }
+
+    .pill.soft {
+      border-color: rgba(148, 163, 255, 0.3);
+      background: rgba(148, 163, 255, 0.14);
+      color: #e5e7eb;
+    }
+
+    .vibe {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--text-soft);
+      max-width: 480px;
+    }
+
+    .mood-orbit {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      font-size: 11px;
+      color: #d1d5db;
+    }
+
+    .mood-orbit span.label {
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 9px;
+      color: #9ca3af;
+    }
+
+    .mood-chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: radial-gradient(circle at top,
+        rgba(249, 115, 22, 0.12),
+        rgba(15, 23, 42, 0.96));
+      border: 1px solid rgba(248, 250, 252, 0.12);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mood-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #f97316;
+      box-shadow: 0 0 10px rgba(249, 115, 22, 0.9);
+    }
+
+    .song-list {
+      position: relative;
+      z-index: 1;
+      margin-top: 8px;
+      border-radius: 14px;
+      padding: 10px 10px 8px;
+      background: radial-gradient(circle at top,
+        rgba(15, 23, 42, 0.9),
+        rgba(15, 23, 42, 0.98));
+      border: 1px solid rgba(148, 163, 255, 0.4);
+    }
+
+    .song-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .song-list-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #9ca3af;
+    }
+
+    .song-count {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .song {
+      padding: 8px 0;
+      border-top: 1px dashed rgba(51, 65, 85, 0.9);
+    }
+
+    .song:first-of-type {
+      border-top: 0;
+    }
+
+    .song-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+    }
+
+    .song-title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .song-title span.artist {
+      font-weight: 400;
+      opacity: 0.86;
+      font-size: 12px;
+    }
+
+    .song-tagline {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .song-body {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+
+    .song-body strong {
+      color: #e5e7eb;
+    }
+
+    .song-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+      font-size: 11px;
+      color: #38bdf8;
+      text-decoration: none;
+    }
+
+    .song-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Cosmic trio section */
+    .trio-box {
+      position: relative;
+      z-index: 1;
+      margin-top: 10px;
+      border-radius: 14px;
+      padding: 10px 10px 8px;
+      border: 1px solid rgba(148, 163, 255, 0.4);
+      background: radial-gradient(circle at top right,
+        rgba(129, 140, 248, 0.25),
+        rgba(15, 23, 42, 0.98));
+    }
+
+    .trio-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .trio-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #e5e7eb;
+    }
+
+    .trio-sub {
+      font-size: 10px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    .trio-selects {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .select-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .select-group label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #9ca3af;
+    }
+
+    .select-group select {
+      min-width: 110px;
+      padding: 4px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 255, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      font-size: 11px;
+    }
+
+    .trio-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 880px) {
+      .trio-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .trio-card {
+      border-radius: 10px;
+      padding: 7px 8px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid rgba(148, 163, 255, 0.55);
+      font-size: 11px;
+    }
+
+    .trio-role {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #9ca3af;
+      margin-bottom: 2px;
+    }
+
+    .trio-sign {
+      font-weight: 600;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .trio-song {
+      font-size: 10px;
+      color: #cbd5f5;
+    }
+
+    .trio-song span.title {
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    .trio-song span.artist {
+      opacity: 0.85;
+    }
+
+    .trio-note {
+      margin-top: 3px;
+      font-size: 9px;
+      color: #9ca3af;
+    }
+
+    .footer-note {
+      margin-top: 6px;
+      font-size: 10px;
+      color: #6b7280;
+      text-align: right;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-note span {
+      color: #9ca3af;
+    }
+
+    /* Vinyl record animation */
+    .vinyl-orbit {
+      position: absolute;
+      right: -18px;
+      bottom: -18px;
+      width: 180px;
+      height: 180px;
+      pointer-events: none;
+      opacity: 0.8;
+      z-index: 0;
+    }
+
+    @media (max-width: 880px) {
+      .vinyl-orbit {
+        width: 150px;
+        height: 150px;
+        opacity: 0.5;
+      }
+    }
+
+    .vinyl-record {
+      position: absolute;
+      inset: 20px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(248, 250, 252, 0.12), transparent 55%),
+        radial-gradient(circle, #020617 0, #020617 30%, #0f172a 55%, #020617 100%);
+      box-shadow:
+        0 0 0 2px rgba(15, 23, 42, 0.9),
+        0 0 0 6px rgba(15, 23, 42, 0.9),
+        0 12px 28px rgba(15, 23, 42, 0.9);
+      animation: spin 16s linear infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .vinyl-center {
+      width: 20%;
+      height: 20%;
+      border-radius: 50%;
+      background: radial-gradient(circle, #f97316 0, #c2410c 60%, #0f172a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 0 18px rgba(249, 115, 22, 0.7);
+    }
+
+    .vinyl-center::after {
+      content: "";
+      width: 18%;
+      height: 18%;
+      border-radius: 50%;
+      background: #020617;
+    }
+
+    .vinyl-label {
+      position: absolute;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #f9fafb;
+      text-align: center;
+      max-width: 70px;
+    }
+
+    .song-bubble {
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.9), rgba(15, 23, 42, 0.98));
+      border: 1px solid rgba(248, 250, 252, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #f9fafb;
+      box-shadow: 0 6px 12px rgba(15, 23, 42, 0.9);
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .bubble-1 {
+      top: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation-delay: 0s;
+    }
+
+    .bubble-2 {
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      animation-delay: 1s;
+    }
+
+    .bubble-3 {
+      right: 10px;
+      top: 62%;
+      transform: translateY(-50%);
+      animation-delay: 2s;
+      background: radial-gradient(circle at top, rgba(244, 114, 182, 0.9), rgba(15, 23, 42, 0.98));
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(-50%) translateX(0); }
+      50% { transform: translateY(-58%) translateX(2px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- LEFT PANEL -->
+    <div>
+      <header>
+        <div class="tag">
+          <span class="tag-dot"></span>
+          <span>Cosmic Playlist Generator</span>
+        </div>
+        <h1>
+          Music <span>for Your Sign</span>
+        </h1>
+        <p class="subtitle">
+          Tap your zodiac sign to get <strong>song recommendations</strong> whose
+          <strong>themes and lyrics mirror your personality</strong> – from fire-sign anthems
+          to soft water-sign confessionals.
+        </p>
+      </header>
+
+      <div class="selector">
+        <div class="selector-label">
+          Choose your Sun sign
+        </div>
+        <div class="zodiac-grid" id="zodiac-grid">
+          <!-- Pills inserted by JS -->
+        </div>
+        <div class="hint">
+          <span class="key">Tip</span>
+          Pick your friends’ signs too and send them their songs.
+        </div>
+
+        <div class="birth-box">
+          <div class="birth-label">Or enter your birthday</div>
+          <div class="birth-row">
+            <input type="date" id="birthdate" />
+            <button id="birth-btn">Reveal my Sun sign</button>
+          </div>
+          <p class="birth-note">
+            We use <span>standard Western (tropical) Sun sign dates</span> based on month &amp; day.
+            For your <span>Moon</span> and <span>Rising</span>, choose what you know from your full chart
+            (or just pick the vibes you like).
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="panel-right">
+      <div class="panel-header">
+        <div class="sign-main">
+          <div class="sign-name" id="sign-name">
+            Aries <span class="emoji" id="sign-emoji">🔥</span>
+          </div>
+          <div class="sign-dates" id="sign-dates">Mar 21 – Apr 19</div>
+          <div class="sign-tags">
+            <div class="pill" id="sign-element">Fire • Cardinal</div>
+            <div class="pill soft" id="sign-vibe-label">Main Character Energy</div>
+          </div>
+          <p class="vibe" id="sign-vibe-text">
+            Bold, impulsive, and fearless – you dive in head-first and figure it
+            out as you go. Your songs sound like adrenaline and fresh beginnings.
+          </p>
+        </div>
+        <div class="mood-orbit">
+          <span class="label">Current Aura</span>
+          <div class="mood-chip">
+            <span class="mood-dot"></span>
+            <span id="sign-mood">Kick-door confidence with a soft heart.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="song-list">
+        <div class="song-list-header">
+          <div class="song-list-title">Curated tracks</div>
+          <div class="song-count" id="song-count">3 songs • lyric-based</div>
+        </div>
+        <div id="songs-container">
+          <!-- Songs inserted by JS -->
+        </div>
+      </div>
+
+      <div class="trio-box">
+        <div class="trio-header">
+          <div>
+            <div class="trio-title">Your cosmic trio playlist</div>
+            <div class="trio-sub">One song each for Sun, Moon &amp; Rising.</div>
+          </div>
+          <div class="trio-selects">
+            <div class="select-group">
+              <label for="moon-select">Moon sign</label>
+              <select id="moon-select"></select>
+            </div>
+            <div class="select-group">
+              <label for="rising-select">Rising sign</label>
+              <select id="rising-select"></select>
+            </div>
+          </div>
+        </div>
+        <div class="trio-grid">
+          <div class="trio-card" id="sun-card"></div>
+          <div class="trio-card" id="moon-card"></div>
+          <div class="trio-card" id="rising-card"></div>
+        </div>
+        <div class="trio-note">
+          This is for fun, not a professional birth-chart calculator – but the vibes are accurate. ✨
+        </div>
+      </div>
+
+      <div class="footer-note">
+        Short lyric ideas only · <span>Stream the full songs on your platform.</span>
+      </div>
+
+      <!-- Vinyl record with song icons -->
+      <div class="vinyl-orbit">
+        <div class="vinyl-record">
+          <div class="vinyl-center">
+            <div class="vinyl-label" id="vinyl-label-text">ARIES</div>
+          </div>
+        </div>
+        <div class="song-bubble bubble-1">S</div>
+        <div class="song-bubble bubble-2">D</div>
+        <div class="song-bubble bubble-3">L</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const zodiacData = {
+      aries: {
+        name: "Aries",
+        emoji: "🔥",
+        dates: "Mar 21 – Apr 19",
+        element: "Fire • Cardinal",
+        label: "Main Character Energy",
+        mood: "Kick-door confidence with a soft heart.",
+        vibe: "Bold, impulsive, competitive and honest. You jump first, think later, and secretly care more than you admit. Your music needs to feel like a power-up.",
+        songs: [
+          {
+            title: "Stronger",
+            artist: "Britney Spears",
+            tagline: "For the Aries comeback arc.",
+            lyricIdea: "Stronger now, not shaken by yesterday.",
+            why: "Aries bounces back fast. This captures your ability to turn every setback into fuel and come back louder, brighter, and more unbothered.",
+            link: "https://open.spotify.com/track/5eeOuqN1hV4ItvQp5JxAjd"
+          },
+          {
+            title: "Don't Stop Me Now",
+            artist: "Queen",
+            tagline: "Your unstoppable, chaotic fun mode.",
+            lyricIdea: "Fast nights, bright lights, nothing can slow you.",
+            why: "High-speed, high-energy, slightly reckless – exactly your default setting when you’re excited and refuse to let anyone kill the vibe.",
+            link: "https://open.spotify.com/track/3z8h0TU7ReDPLIbEnYhWZb"
+          },
+          {
+            title: "Levitating",
+            artist: "Dua Lipa",
+            tagline: "Flirty, fearless, and on the move.",
+            lyricIdea: "You want me, I want you, no hesitation.",
+            why: "Direct, playful, no time for games – this mirrors how you go straight for what (or who) you want without overthinking.",
+            link: "https://open.spotify.com/track/463CkQjx2Zk1yXoBuierM9"
+          }
+        ]
+      },
+      taurus: {
+        name: "Taurus",
+        emoji: "🌿",
+        dates: "Apr 20 – May 20",
+        element: "Earth • Fixed",
+        label: "Soft Luxury & Stubborn Hearts",
+        mood: "Comfort, slow love, and quiet loyalty.",
+        vibe: "Grounded, sensual, loyal and stubborn in the best way. You love stability, good food, soft blankets, and music that feels like warm lighting.",
+        songs: [
+          {
+            title: "Adore You",
+            artist: "Harry Styles",
+            tagline: "Patient, steady affection in song form.",
+            lyricIdea: "I’d cross the storm just to stand by you.",
+            why: "Taurus love is slow but deeply devoted. This reflects how far you’ll go once you decide someone is really yours.",
+            link: "https://open.spotify.com/track/3j3SqH1fZzPZx9XQh5m7tG"
+          },
+          {
+            title: "Gravity",
+            artist: "John Mayer",
+            tagline: "The grounded side of your soul.",
+            lyricIdea: "Keep me close to where the light feels safe.",
+            why: "You crave stability and inner peace. This mirrors your instinct to stay in places, people, and routines that feel safe and familiar.",
+            link: "https://open.spotify.com/track/6VzdEWOjzpx8ZLQn0cpeBp"
+          },
+          {
+            title: "Best Part",
+            artist: "Daniel Caesar, H.E.R.",
+            tagline: "Soft romance, slow mornings, cozy hearts.",
+            lyricIdea: "When I wake up near you, the world softens.",
+            why: "Taurus is all about touch, comfort and loyalty. This matches your love for simple, intimate moments over dramatic declarations.",
+            link: "https://open.spotify.com/track/6C8QJmxx8V1uimZ22WbBp9"
+          }
+        ]
+      },
+      gemini: {
+        name: "Gemini",
+        emoji: "💫",
+        dates: "May 21 – Jun 20",
+        element: "Air • Mutable",
+        label: "Duality & Late-Night Thoughts",
+        mood: "Overthinking, oversharing, never boring.",
+        vibe: "Curious, witty, chaotic and charming. You switch moods like playlists and need songs that feel like different conversations in one night.",
+        songs: [
+          {
+            title: "Style",
+            artist: "Taylor Swift",
+            tagline: "On-and-off, but always magnetic.",
+            lyricIdea: "We go in circles, but the spark stays.",
+            why: "Your connections come back around, full of inside jokes and unfinished stories – exactly the on-off vibe this song carries.",
+            link: "https://open.spotify.com/track/3wgQofYbC2qkU5VZOBjhtT"
+          },
+          {
+            title: "Shut Up and Dance",
+            artist: "WALK THE MOON",
+            tagline: "For your impulsive social butterfly moments.",
+            lyricIdea: "No small talk, just lights, laughs, and dancing.",
+            why: "Gemini loves a good random adventure. This fits your tendency to go from ‘bored’ to ‘wild story’ in five minutes.",
+            link: "https://open.spotify.com/track/625W5HyUq1cGKkEx5rV5MZ"
+          },
+          {
+            title: "Midnight City",
+            artist: "M83",
+            tagline: "Wandering thoughts, city lights, endless options.",
+            lyricIdea: "Night drives, loud thoughts, every road a question.",
+            why: "Your mind never stops. This track feels like mentally running through five timelines while staring out of a car window.",
+            link: "https://open.spotify.com/track/6u0d5FA3TK0zWqAFdx16EK"
+          }
+        ]
+      },
+      cancer: {
+        name: "Cancer",
+        emoji: "🌙",
+        dates: "Jun 21 – Jul 22",
+        element: "Water • Cardinal",
+        label: "Soft Shell, Deep Ocean",
+        mood: "Nostalgia, comfort, and tearful hugs.",
+        vibe: "Intuitive, protective, sentimental and moody. You collect memories and feelings like seashells – your songs need to hit the heart, not just the ears.",
+        songs: [
+          {
+            title: "All of Me",
+            artist: "John Legend",
+            tagline: "Devoted love and emotional safety.",
+            lyricIdea: "All my edges still reach for your heart.",
+            why: "You love deeply and want to be loved for your whole self – moods, softness, flaws and all.",
+            link: "https://open.spotify.com/track/3U4isOIWM3VvDubwSI3y7a"
+          },
+          {
+            title: "Someone Like You",
+            artist: "Adele",
+            tagline: "For the days you sit with your feelings.",
+            lyricIdea: "I wish you well, even while I miss you.",
+            why: "Cancer feels things intensely but also genuinely wants the best for people they’ve loved, even when it hurts.",
+            link: "https://open.spotify.com/track/4kflIGfjdZJW4ot2ioixTB"
+          },
+          {
+            title: "Heather",
+            artist: "Conan Gray",
+            tagline: "Soft longing and unspoken dreams.",
+            lyricIdea: "In another life, maybe you’d look my way.",
+            why: "This matches your tender side: secret crushes, quiet heartbreak, and daydreaming about ‘what if’ in the dark.",
+            link: "https://open.spotify.com/track/1f5cbQtDrykjarZVrShaDI"
+          }
+        ]
+      },
+      leo: {
+        name: "Leo",
+        emoji: "🦁",
+        dates: "Jul 23 – Aug 22",
+        element: "Fire • Fixed",
+        label: "Golden Main Character",
+        mood: "Spotlight, loyalty, dramatic romance.",
+        vibe: "Warm, expressive, loyal and dramatic in the cutest way. You need songs that sound like walking into a room and everyone noticing.",
+        songs: [
+          {
+            title: "Uptown Funk",
+            artist: "Mark Ronson ft. Bruno Mars",
+            tagline: "Lights, confidence, and playful bragging.",
+            lyricIdea: "Too much charm, too much rhythm to hide.",
+            why: "Leo energy is bold and fun. This track matches your love of being the fun friend everyone remembers.",
+            link: "https://open.spotify.com/track/32OlwWuMpZ6b0aN2RZOeMS"
+          },
+          {
+            title: "Halo",
+            artist: "Beyoncé",
+            tagline: "Softness behind the strong front.",
+            lyricIdea: "You saw my armor and chose my heart.",
+            why: "Under your confident exterior, you crave someone who sees your vulnerable side and treats it gently.",
+            link: "https://open.spotify.com/track/4JehYebiI9JE8sR8MisGVb"
+          },
+          {
+            title: "Kings & Queens",
+            artist: "Ava Max",
+            tagline: "Royal, loud, and empowering.",
+            lyricIdea: "Crowns shine brighter when we rise together.",
+            why: "You hype yourself and your people up. This track is your group-chat anthem energy.",
+            link: "https://open.spotify.com/track/76cy1WJvNGJTj78UqeA5zr"
+          }
+        ]
+      },
+      virgo: {
+        name: "Virgo",
+        emoji: "🌾",
+        dates: "Aug 23 – Sep 22",
+        element: "Earth • Mutable",
+        label: "Soft Perfectionist",
+        mood: "Fixing everything, including your own heart.",
+        vibe: "Analytical, caring, observant and self-critical. You notice everything, feel more than you show, and need lyrics that sound like inner monologues.",
+        songs: [
+          {
+            title: "The Night We Met",
+            artist: "Lord Huron",
+            tagline: "Overthinking one moment forever.",
+            lyricIdea: "I replay that night, searching for new answers.",
+            why: "You revisit memories, analysing every look and word. This track fits that bittersweet, reflective side of you.",
+            link: "https://open.spotify.com/track/3QwBODjSEzelZyVjxPoB1w"
+          },
+          {
+            title: "Vienna",
+            artist: "Billy Joel",
+            tagline: "A reminder to slow down.",
+            lyricIdea: "You’re allowed to pause; the world won’t leave.",
+            why: "Virgo tends to push too hard. This song gently reminds you it’s okay not to fix everything at once.",
+            link: "https://open.spotify.com/track/3FCto7hnn1shUyZL42YgfO"
+          },
+          {
+            title: "Lose You To Love Me",
+            artist: "Selena Gomez",
+            tagline: "Healing through honest self-reflection.",
+            lyricIdea: "I lost us, but I finally found me.",
+            why: "You grow quietly after endings, turning pain into structure and self-respect.",
+            link: "https://open.spotify.com/track/6NFyWDv5CjfwuzoCkw47Xf"
+          }
+        ]
+      },
+      libra: {
+        name: "Libra",
+        emoji: "⚖️",
+        dates: "Sep 23 – Oct 22",
+        element: "Air • Cardinal",
+        label: "Charm & Compromise",
+        mood: "Romantic texts, pretty playlists, soft chaos.",
+        vibe: "Charming, diplomatic, indecisive and aesthetic-driven. You crave harmony, beauty and partnership – your songs have to feel romantic and well-balanced.",
+        songs: [
+          {
+            title: "Electric Love",
+            artist: "BØRNS",
+            tagline: "Crush energy with glitter.",
+            lyricIdea: "You hit my world like a neon storm.",
+            why: "Libra loves the dreamy, romantic high of a crush. This track feels like butterflies and fairy lights.",
+            link: "https://open.spotify.com/track/0Jq4x8ju0aqTg46jbUqFz5"
+          },
+          {
+            title: "Just the Way You Are",
+            artist: "Bruno Mars",
+            tagline: "Seeing beauty in every detail.",
+            lyricIdea: "Every little flaw makes you more perfect.",
+            why: "You’re drawn to the idea of unconditional acceptance, and you often see beauty where others miss it.",
+            link: "https://open.spotify.com/track/7BqBn9nzAq8spo5e7cZ0dJ"
+          },
+          {
+            title: "Stuck with U",
+            artist: "Ariana Grande & Justin Bieber",
+            tagline: "Love as a safe little world.",
+            lyricIdea: "Lock the door, the world can spin without us.",
+            why: "Libra loves partnership and the feeling of being in a little bubble with their favorite person.",
+            link: "https://open.spotify.com/track/4HBZA5flZLE435QTztThqH"
+          }
+        ]
+      },
+      scorpio: {
+        name: "Scorpio",
+        emoji: "🦂",
+        dates: "Oct 23 – Nov 21",
+        element: "Water • Fixed",
+        label: "Intensity & Secrets",
+        mood: "Deep talks, dark playlists, silent loyalty.",
+        vibe: "Intense, private, magnetic and all-or-nothing. You like lyrics that feel like confessions, revenge fantasies, or secrets no one else knows.",
+        songs: [
+          {
+            title: "Bad Romance",
+            artist: "Lady Gaga",
+            tagline: "Obsessive, dramatic, unforgettable.",
+            lyricIdea: "I want the truth, even when it burns.",
+            why: "Scorpio doesn’t do shallow. This matches your attraction to messy but unforgettable connections.",
+            link: "https://open.spotify.com/track/0SiywuOBRcynK0uKGWdCnn"
+          },
+          {
+            title: "bellyache",
+            artist: "Billie Eilish",
+            tagline: "Dark humor, darker thoughts.",
+            lyricIdea: "I laugh it off, but the storm stays inside.",
+            why: "You joke about the heavy stuff, but your emotions run deep – this song taps into that contrast.",
+            link: "https://open.spotify.com/track/1Qrg8KqiBpW07V7PNxwwwL"
+          },
+          {
+            title: "Take Me to Church",
+            artist: "Hozier",
+            tagline: "Devotion mixed with rebellion.",
+            lyricIdea: "I kneel for love, not for rules.",
+            why: "You question everything but love fiercely. This song feels like your intense, spiritual side of connection.",
+            link: "https://open.spotify.com/track/1CS7Sd1u5tWkstBhpssyjP"
+          }
+        ]
+      },
+      sagittarius: {
+        name: "Sagittarius",
+        emoji: "🏹",
+        dates: "Nov 22 – Dec 21",
+        element: "Fire • Mutable",
+        label: "Chaos, Hope & Flight Tickets",
+        mood: "Jokes, plans, and disappearing to another city.",
+        vibe: "Optimistic, restless, blunt and adventurous. You need songs that sound like road trips, impulsive trips, and laughing at 3 a.m.",
+        songs: [
+          {
+            title: "On Top of the World",
+            artist: "Imagine Dragons",
+            tagline: "For your “I’ll figure it out” era.",
+            lyricIdea: "I don’t know the path, but I’m running.",
+            why: "You chase experiences over certainty. This track matches your faith that things will work out somehow.",
+            link: "https://open.spotify.com/track/4Q7cFXl5cZ0LQZq0m0JX2n"
+          },
+          {
+            title: "Riptide",
+            artist: "Vance Joy",
+            tagline: "Random, quirky, and oddly emotional.",
+            lyricIdea: "I trip through life, humming a secret melody.",
+            why: "Your stories never go in straight lines – this song’s playful chaos matches your storytelling energy.",
+            link: "https://open.spotify.com/track/57iDD2g1vK8fGJ1v0B7pAZ"
+          },
+          {
+            title: "Firework",
+            artist: "Katy Perry",
+            tagline: "One big motivational speech in song form.",
+            lyricIdea: "You’re meant to light up places you’ve never seen.",
+            why: "You inspire people without trying. This song is that friend who reminds you how big your spirit really is.",
+            link: "https://open.spotify.com/track/4lCv7b86sLynZbXhfScfm2"
+          }
+        ]
+      },
+      capricorn: {
+        name: "Capricorn",
+        emoji: "⛰️",
+        dates: "Dec 22 – Jan 19",
+        element: "Earth • Cardinal",
+        label: "Quiet Grind & Hidden Softness",
+        mood: "Work now, feelings later (maybe).",
+        vibe: "Ambitious, disciplined, dry-humored and secretly sentimental. You love songs that feel like resilience, progress, and private softness.",
+        songs: [
+          {
+            title: "Stronger (What Doesn't Kill You)",
+            artist: "Kelly Clarkson",
+            tagline: "Your resilience theme song.",
+            lyricIdea: "Every fall became another step up.",
+            why: "You turn hardship into structure and strength. This track matches your tough, patient climb energy.",
+            link: "https://open.spotify.com/track/4xkOaSrkexMciUUogZKVTS"
+          },
+          {
+            title: "Work",
+            artist: "Rihanna ft. Drake",
+            tagline: "Busy schedule, complicated feelings.",
+            lyricIdea: "Chasing goals while my heart leaves voicemails.",
+            why: "You juggle ambition with messy emotions, often prioritizing responsibilities over romance.",
+            link: "https://open.spotify.com/track/0kN8xEmgMW9mh7UmDYHlJP"
+          },
+          {
+            title: "The Climb",
+            artist: "Miley Cyrus",
+            tagline: "Seeing the value in the struggle.",
+            lyricIdea: "The road is rough, but I trust my steps.",
+            why: "You know growth happens in the effort, not the flex. This song echoes your long-game mindset.",
+            link: "https://open.spotify.com/track/4kbj5MwxO1bq9wjT5g9HaA"
+          }
+        ]
+      },
+      aquarius: {
+        name: "Aquarius",
+        emoji: "🌌",
+        dates: "Jan 20 – Feb 18",
+        element: "Air • Fixed",
+        label: "Alien Brain, Human Heart",
+        mood: "Detached but somehow the therapist friend.",
+        vibe: "Independent, unconventional, future-minded and idealistic. You like songs that feel unique, a bit weird, and low-key revolutionary.",
+        songs: [
+          {
+            title: "Royals",
+            artist: "Lorde",
+            tagline: "Rejecting the script you were given.",
+            lyricIdea: "We make our own crown from broken rules.",
+            why: "You question systems and prefer authenticity over flexing – this track embodies that energy.",
+            link: "https://open.spotify.com/track/2dLLR6qlu5UJ5gk0dKz0h3"
+          },
+          {
+            title: "Sweater Weather",
+            artist: "The Neighbourhood",
+            tagline: "Detached, yet secretly very intense.",
+            lyricIdea: "I joke around while my heartbeat yells truths.",
+            why: "You seem chill, but your inner world is stormy and idealistic. This song fits that soft chaos.",
+            link: "https://open.spotify.com/track/2QjOHCTQ1Jl3zawyYOpxh6"
+          },
+          {
+            title: "Dreams",
+            artist: "Fleetwood Mac",
+            tagline: "Floaty, reflective, a bit witchy.",
+            lyricIdea: "Thunder rolls while I quietly change directions.",
+            why: "You evolve in strange, unexpected ways. This track feels like watching your old life from far above.",
+            link: "https://open.spotify.com/track/0ofHAoxe9vBkTCp2UQIavz"
+          }
+        ]
+      },
+      pisces: {
+        name: "Pisces",
+        emoji: "🐚",
+        dates: "Feb 19 – Mar 20",
+        element: "Water • Mutable",
+        label: "Dreams, Delusions & Deep Feels",
+        mood: "Romanticizing everything, even the sadness.",
+        vibe: "Empathetic, dreamy, artistic and escapist. You need songs that feel like underwater emotions, movie scenes, and daydreams that never end.",
+        songs: [
+          {
+            title: "lovely",
+            artist: "Billie Eilish & Khalid",
+            tagline: "Sad but strangely beautiful.",
+            lyricIdea: "If this is the storm, at least it’s stunning.",
+            why: "You turn pain into poetry. This track captures your ability to sit with heavy feelings and still find beauty.",
+            link: "https://open.spotify.com/track/0u2P5u6lvoDfwTYjAADbn4"
+          },
+          {
+            title: "Glue Song",
+            artist: "beabadoobee",
+            tagline: "Soft love, soft worldbuilding.",
+            lyricIdea: "You feel like the glue in my universe.",
+            why: "Pisces love feels like building a tiny, gentle world for two people – this song is exactly that vibe.",
+            link: "https://open.spotify.com/track/3Zwu2K0Qa5sT6teCCHPShP"
+          },
+          {
+            title: "Ocean Eyes",
+            artist: "Billie Eilish",
+            tagline: "Eyes full of entire galaxies.",
+            lyricIdea: "Your gaze pulls me into quiet galaxies.",
+            why: "You connect through emotion and intuition. This track feels like staring into someone and seeing too much.",
+            link: "https://open.spotify.com/track/7hDVYcQq6MxkdJGweuCtl9"
+          }
+        ]
+      }
+    };
+
+    const order = [
+      "aries","taurus","gemini","cancer","leo","virgo",
+      "libra","scorpio","sagittarius","capricorn","aquarius","pisces"
+    ];
+
+    let currentSignKey = "aries";
+
+    const zodiacGrid = document.getElementById("zodiac-grid");
+    const signNameEl = document.getElementById("sign-name");
+    const signEmojiEl = document.getElementById("sign-emoji");
+    const signDatesEl = document.getElementById("sign-dates");
+    const signElementEl = document.getElementById("sign-element");
+    const signVibeLabelEl = document.getElementById("sign-vibe-label");
+    const signVibeTextEl = document.getElementById("sign-vibe-text");
+    const signMoodEl = document.getElementById("sign-mood");
+    const songsContainer = document.getElementById("songs-container");
+    const songCountEl = document.getElementById("song-count");
+    const vinylLabelEl = document.getElementById("vinyl-label-text");
+    const songBubbleEls = document.querySelectorAll(".song-bubble");
+
+    const birthInput = document.getElementById("birthdate");
+    const birthBtn = document.getElementById("birth-btn");
+
+    const moonSelect = document.getElementById("moon-select");
+    const risingSelect = document.getElementById("rising-select");
+    const sunCard = document.getElementById("sun-card");
+    const moonCard = document.getElementById("moon-card");
+    const risingCard = document.getElementById("rising-card");
+
+    function createPillsAndSelects() {
+      order.forEach(key => {
+        const sign = zodiacData[key];
+        // pills
+        const btn = document.createElement("button");
+        btn.className = "zodiac-pill";
+        btn.dataset.signKey = key;
+
+        const spanSign = document.createElement("span");
+        spanSign.className = "sign";
+        spanSign.textContent = sign.name;
+
+        const spanElement = document.createElement("span");
+        spanElement.className = "element";
+        spanElement.textContent = sign.element.split("•")[0].trim(); // just element
+
+        btn.appendChild(spanSign);
+        btn.appendChild(spanElement);
+
+        btn.addEventListener("click", () => {
+          setActiveSign(key);
+        });
+
+        zodiacGrid.appendChild(btn);
+
+        // options for moon & rising
+        const optMoon = document.createElement("option");
+        optMoon.value = key;
+        optMoon.textContent = `${sign.name} ${sign.emoji}`;
+        moonSelect.appendChild(optMoon);
+
+        const optRising = document.createElement("option");
+        optRising.value = key;
+        optRising.textContent = `${sign.name} ${sign.emoji}`;
+        risingSelect.appendChild(optRising);
+      });
+
+      // default moon & rising
+      moonSelect.value = "pisces";
+      risingSelect.value = "leo";
+
+      moonSelect.addEventListener("change", renderTrioCards);
+      risingSelect.addEventListener("change", renderTrioCards);
+    }
+
+    function setActiveSign(key) {
+      const sign = zodiacData[key];
+      currentSignKey = key;
+
+      // update left active state
+      document
+        .querySelectorAll(".zodiac-pill")
+        .forEach(pill => pill.classList.remove("active"));
+      const activePill = Array.from(document.querySelectorAll(".zodiac-pill"))
+        .find(pill => pill.dataset.signKey === key);
+      if (activePill) activePill.classList.add("active");
+
+      // update right panel
+      signNameEl.innerHTML = `${sign.name} <span class="emoji">${sign.emoji}</span>`;
+      signDatesEl.textContent = sign.dates;
+      signElementEl.textContent = sign.element;
+      signVibeLabelEl.textContent = sign.label;
+      signVibeTextEl.textContent = sign.vibe;
+      signMoodEl.textContent = sign.mood;
+
+      // songs list
+      songsContainer.innerHTML = "";
+      sign.songs.forEach(song => {
+        const songEl = document.createElement("div");
+        songEl.className = "song";
+
+        const top = document.createElement("div");
+        top.className = "song-top";
+
+        const titleEl = document.createElement("div");
+        titleEl.className = "song-title";
+        titleEl.innerHTML = `${song.title} <span class="artist">• ${song.artist}</span>`;
+
+        const tagEl = document.createElement("div");
+        tagEl.className = "song-tagline";
+        tagEl.textContent = song.tagline;
+
+        top.appendChild(titleEl);
+        top.appendChild(tagEl);
+
+        const body = document.createElement("div");
+        body.className = "song-body";
+        body.innerHTML =
+          `<strong>Lyric vibe:</strong> ${song.lyricIdea}<br>` +
+          `<strong>Why it fits you:</strong> ${song.why}`;
+
+        const link = document.createElement("a");
+        link.className = "song-link";
+        link.href = song.link;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.innerHTML = `Play on Spotify ↗`;
+
+        songEl.appendChild(top);
+        songEl.appendChild(body);
+        songEl.appendChild(link);
+
+        songsContainer.appendChild(songEl);
+      });
+
+      songCountEl.textContent = `${sign.songs.length} songs • lyric-based`;
+
+      // update vinyl label & song icons
+      if (vinylLabelEl) {
+        vinylLabelEl.textContent = sign.name.toUpperCase();
+      }
+      if (songBubbleEls && songBubbleEls.length) {
+        songBubbleEls.forEach((bubble, index) => {
+          const song = sign.songs[index];
+          if (song) {
+            bubble.textContent = song.title.charAt(0).toUpperCase();
+          } else {
+            bubble.textContent = "♫";
+          }
+        });
+      }
+
+      // update trio section Sun card
+      renderTrioCards();
+    }
+
+    function getSunSignKeyFromDate(month, day) {
+      // Using standard tropical Western zodiac date ranges (approximate, no year/time)
+      if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return "aries";
+      if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return "taurus";
+      if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return "gemini";
+      if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return "cancer";
+      if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return "leo";
+      if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return "virgo";
+      if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return "libra";
+      if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return "scorpio";
+      if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return "sagittarius";
+      if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return "capricorn";
+      if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return "aquarius";
+      return "pisces"; // (Feb 19 – Mar 20)
+    }
+
+    function handleBirthdayClick() {
+      const value = birthInput.value;
+      if (!value) {
+        alert("Pick your birthday first ✨");
+        return;
+      }
+      const date = new Date(value + "T12:00:00");
+      if (isNaN(date)) {
+        alert("That date looks a bit cosmic-glitched. Try again.");
+        return;
+      }
+      const month = date.getUTCMonth() + 1; // 1-12
+      const day = date.getUTCDate();
+      const key = getSunSignKeyFromDate(month, day);
+      setActiveSign(key);
+      // Optionally scroll into view
+      document.querySelector(".panel-right")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function buildTrioCard(role, signKey, targetEl) {
+      const sign = zodiacData[signKey];
+      if (!sign || !sign.songs.length) {
+        targetEl.innerHTML = "<div class=\"trio-role\">" + role + "</div><div class=\"trio-song\">No vibe found.</div>";
+        return;
+      }
+      const song = sign.songs[0];
+      targetEl.innerHTML =
+        `<div class="trio-role">${role}</div>
+         <div class="trio-sign">${sign.name} <span>${sign.emoji}</span></div>
+         <div class="trio-song"><span class="title">${song.title}</span> <span class="artist">• ${song.artist}</span></div>`;
+    }
+
+    function renderTrioCards() {
+      buildTrioCard("Sun", currentSignKey, sunCard);
+      buildTrioCard("Moon", moonSelect.value, moonCard);
+      buildTrioCard("Rising", risingSelect.value, risingCard);
+    }
+
+    createPillsAndSelects();
+    setActiveSign("aries");
+
+    birthBtn.addEventListener("click", handleBirthdayClick);
+  </script>
+</body>
+</html>
